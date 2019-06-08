@@ -43,8 +43,8 @@ export default class CircleHelper {
 	public static getDirectionPoint(origin: Point, startRadian: number, endRadian: number, radius: number = 10): Point {
 		let radian = Math.PI*2 / 360 * (Math.random() * endRadian + (endRadian - startRadian));
 		return {
-			x: origin.x + radius * Math.cos(radian),
-			y: origin.y + radius * Math.sin(radian)
+			x: origin.x + Math.round(radius * Math.cos(radian)),
+			y: origin.y + Math.round(radius * Math.sin(radian))
 		}
 	} 
 

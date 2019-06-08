@@ -1,10 +1,11 @@
-import { Point } from './canvas';
+import { Point, LineGradientColor, LineGradientConfig } from './canvas';
+import CircleHelper from './circle-helper';
 /**
  * CanvasHelper类
  * @export
  * @class CanvasHelper
  */
-export default class CanvasHelper {
+export class CanvasHelper {
 
 	/**
 	 * CanvasHelper可视区宽高倍数,默认为1倍
@@ -56,5 +57,50 @@ export default class CanvasHelper {
 			y: CanvasHelper.height() / 2
 		};
 	}
+
+	public static origin(): Point {
+		return {
+			x: Math.round(Math.random() * CanvasHelper.width()),
+			y: Math.round(Math.random() * CanvasHelper.height())
+		}
+		 
+	}
 	
+}
+
+export class SportLine {
+	public points: Point[] = [];
+	public color: LineGradientColor;
+	public lineWidth: number;
+	public lineSize: number;
+	public lineSpace: number;
+	constructor(config: LineGradientConfig) {
+		this.color = config.color;
+		this.lineWidth = config.lineWidth || 10;
+		this.lineSize = config.lineSize || 30;
+		this.lineSpace = config.lineSpace || 10; // 10px
+		this.initPoint();
+	}
+
+	private initPoint():void {
+		let origin = CanvasHelper.center();
+		this.points.push(origin);
+		for (let index = 0; index < this.lineSize - 1; index++) {
+			let last = this.points[this.points.length - 1];
+			// let current = CircleHelper.getDirectionPoint(last, 0, 360, this.lineSpace);
+			let current = CircleHelper.getFirstQuadrantPoint(last);
+			this.points.push(current);
+		}
+		console.info('origin', this.points);
+	}
+
+	public move():void {
+		let lll = this.points.shift();
+		// console.info(lll)
+		let last = this.points[this.points.length - 1];
+		// let current = CircleHelper.getDirectionPoint(last, 0, 360, this.lineSpace);
+		let current = CircleHelper.getFirstQuadrantPoint(last);
+		this.points.push(current);
+		// console.info(this.points)
+	}
 }

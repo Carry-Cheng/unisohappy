@@ -1,9 +1,10 @@
 
 import React, { Component } from 'react';
 import { CanvasProps, CanvasState } from './canvas.d';
-import { Point } from '../../core/canvas.d';
-import CanvasHelper from '../../core/canvas-helper';
-import CircleHelper from './../../core/circle-helper';
+import { Point, LineGradientConfig } from '../../core/canvas.d';
+import { CanvasHelper, SportLine } from '../../core/canvas-helper';
+import CircleHelper from '../../core/circle-helper';
+import Color from '../../core/color';
 
 const Style = require('./canvas.less');
 
@@ -15,6 +16,7 @@ export default class Canvas extends Component<CanvasProps, CanvasState> {
 	context: CanvasRenderingContext2D = undefined;
 
 	linePoints: Point[] = [];
+	sportLines: SportLine[] = [];
 
 	constructor(props: CanvasProps) {
 		super(props);
@@ -34,9 +36,6 @@ export default class Canvas extends Component<CanvasProps, CanvasState> {
 
 	componentDidMount() {
 		this.initCanvas();
-		// this.drawQuadraticCurve();
-		// this.drawQuadraticCurveHigh();
-		// this.drawSportLine();
 		this.drawFreeMovementLint();
 	}
 
@@ -60,8 +59,6 @@ export default class Canvas extends Component<CanvasProps, CanvasState> {
 			}
 		}, () => {
 			this.clearCanvas();
-			// this.drawQuadraticCurveHigh();
-			// this.drawSportLine();
 			this.drawFreeMovementLint();
 		});
 	}
@@ -72,160 +69,70 @@ export default class Canvas extends Component<CanvasProps, CanvasState> {
 
 	// 绘制一条自由运动的曲线
 	drawFreeMovementLint = () => {
-		let gradient = this.context.createLinearGradient(0, 0, this.state.canvasWidth, this.state.canvasHeight);
-		gradient.addColorStop(0, '#FCCF31');
-		gradient.addColorStop(1, '#F55555');
-		this.context.lineWidth = 3;
-		this.context.lineCap = 'round';
-		this.context.strokeStyle = gradient;
-		this.linePoints = [];
-		this.linePoints.push({ x: CanvasHelper.center().x, y: CanvasHelper.center().y});
-		let interval = setInterval(() => {
-			let last = this.linePoints[this.linePoints.length - 1];
-			let current = CircleHelper.getDirectionPoint(last, 0, 360);
-			this.linePoints.push(current);
-			if (this.linePoints.length === 50) {
-				this.linePoints.splice(0,1);
-			}
-			this.context.moveTo(this.linePoints[0].x, this.linePoints[0].y);
-			this.linePoints.forEach(element => {
-				this.context.lineTo(element.x, element.y);
-			});
+		let timessssss = 1;
+		let sx = 0;
+		let ex = CanvasHelper.width();
+		let intervalsssss = setInterval(() => {
+			this.clearCanvas();
+			let gradient = this.context.createLinearGradient(sx, 100*timessssss, ex, 100*timessssss);
+			gradient.addColorStop(0, '#ff0000');
+			gradient.addColorStop(1, '#0080ff');
+			this.context.lineWidth = 10;
+			this.context.lineCap = 'round';
+			this.context.strokeStyle = gradient;
+			this.context.moveTo(sx, 100*timessssss);
+			this.context.lineTo(ex, 100*timessssss);
 			this.context.stroke();
-			if (this.linePoints.length === 10000) {
-				clearInterval(interval);
-				interval = null;
+			timessssss++;
+			if(timessssss > 10) {
+				clearInterval(intervalsssss);
+				intervalsssss = null;
 			}
-		}, 100);
-	}
+		}, 1000)
 
-	// 二次贝塞尔曲线
-	drawQuadraticCurve = () => {
-		this.context.strokeStyle = "#ff0000";
-		this.context.beginPath();
-		this.context.moveTo(100, 500);
-		this.context.quadraticCurveTo(300, 300, 500, 500);
-		this.context.stroke();
-	}
 
-	// 二次贝塞尔高阶曲线
-	drawQuadraticCurveHigh = () => {
-		let points: Point[] = [
-			{x: 60, y: 200},{x: 100, y: 320},{x: 160, y: 20},{x: 260, y: 100},{x: 360, y: 250},
-			{x: 460, y: 600},{x: 520, y: 300},{x: 660, y: 500},{x: 860, y: 400},{x: 1060, y: 200}
-		];
-		// 绘制折线
-		this.context.strokeStyle = "#ff0000";
-		this.context.beginPath();
-		points.forEach((element, index) => {
-			if (index === 0) {
-				this.context.moveTo(element.x, element.y);
-			} else {
-				this.context.lineTo(element.x, element.y);
-			}
-		});
-		this.context.stroke();
-		// 绘制贝塞尔曲线
-		this.context.strokeStyle = "#ffff00";
-		this.context.beginPath();
-		for (let index = 0; index < points.length - 1; index++) {
-			const element = points[index];
-			const next = points[index+1];
-			const controlPoint = this.getControlPoint(element, next);
-			this.context.moveTo(element.x, element.y);
-			this.context.quadraticCurveTo(controlPoint.x, controlPoint.y, next.x, next.y);
-		}
-		this.context.stroke();
-	}
-	
-	// get control point
-	getControlPoint = (p1: Point, p2: Point): Point => {
-		return {
-			x: p1.x + (p2.x - p1.x)/2 - 50,
-			y: p1.y + (p2.y - p1.y)/2 - 50
-		}
-	}
 
-	// 绘制一条运动的线条
-	drawSportLine = () => {
-		let gradient = this.context.createLinearGradient(0, 0, this.state.canvasWidth, this.state.canvasHeight);
-		gradient.addColorStop(0, '#FCCF31');
-		gradient.addColorStop(1, '#F55555');
-		this.context.lineWidth = 3;
-		this.context.lineCap = 'round';
-		this.context.strokeStyle = gradient;
-		this.linePoints = [];
-		this.linePoints.push({ x: CanvasHelper.center().x, y: CanvasHelper.center().y});
-		this.context.moveTo(CanvasHelper.center().x, CanvasHelper.center().y);
-		this.testIphone();
-		return;
-		let interval = setInterval(() => {
-			let over = this.startSportLine();
-			if (over) {
-				clearInterval(interval);
-				interval = null;
-			}
-		}, 50);
-	}
-
-	startSportLine = (): boolean => {
-		let last = this.linePoints[this.linePoints.length - 1];
-		// 朝第一象限运动
-		let current = CircleHelper.getFirstQuadrantPoint(last);
-		this.linePoints.push(current);
-		if (this.linePoints.length > 100) {
-			this.linePoints.splice(0,1);
-		}
-		this.context.moveTo(this.linePoints[0].x, this.linePoints[0].y);
-		this.linePoints.forEach(element => {
-			this.context.lineTo(element.x, element.y);
-		});
-		this.context.stroke();
-		
-		if (this.linePoints.length === 100) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	testIphone = () => {
-		let lll = 0;
-		setInterval(() => {
-			alert(lll);
-			lll++;
-		}, 1000);
-		return 
-		let kkk = 0;
-		let interval1 = setInterval(() => {
-			this.context.lineTo(CanvasHelper.center().x + 10* kkk, CanvasHelper.center().y + 10* kkk);
-			this.context.stroke();
-			kkk++;
-			if (kkk === 100) {
-				clearInterval(interval1);
-				interval1 = null;
-			}
-		}, 100);
 		return
+		let colors = Color.customLineGradientColors(); // 190 = 19+18+...+1
+		for (let index = 0; index < 1; index++) {
+			const color = colors[index];
+			const config:LineGradientConfig = {
+				color: color,
+				lineWidth: undefined,
+				lineSize: undefined,
+				lineSpace: undefined
+			} 
+			const line = new SportLine(config);
+			this.sportLines.push(line);
+		}
+		// draw
+		let times = 0;
 		let interval = setInterval(() => {
-			let last = this.linePoints[this.linePoints.length - 1];
-			// 朝第一象限运动
-			let current = CircleHelper.getFirstQuadrantPoint(last);
-			this.linePoints.push(current);
-			if (this.linePoints.length > 100) {
-				this.linePoints.splice(0,1);
-			}
-			this.context.moveTo(this.linePoints[0].x, this.linePoints[0].y);
-			this.linePoints.forEach(element => {
-				this.context.lineTo(element.x, element.y);
+			this.clearCanvas();
+			this.sportLines.forEach(element => {
+				element.move();
+				let points = element.points;
+				let s = points[0], e = points[points.length - 1 ];
+				console.info(s)
+				let gradient = this.context.createLinearGradient(s.x, s.y, e.x, e.y);
+				gradient.addColorStop(0, element.color.begin);
+				gradient.addColorStop(1, element.color.end);
+				this.context.lineWidth = element.lineWidth;
+				this.context.lineCap = 'round';
+				this.context.strokeStyle = gradient;
+				this.context.moveTo(s.x, s.y);
+				for (let index = 1; index < points.length; index++) {
+					this.context.lineTo(points[index].x, points[index].y);
+				}
+				this.context.stroke();
 			});
-			this.context.stroke();
-
-			if (this.linePoints.length === 100) {
+			times++;
+			if(times === 10) {
 				clearInterval(interval);
 				interval = null;
 			}
-		}, 50);
+		}, 200)
 	}
+
 
 }
