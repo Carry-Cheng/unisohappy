@@ -11,6 +11,8 @@ export default class Index extends Component {
 				<h2>Build with Parcel</h2>
 				<a href="/canvas">Canvas Demo</a>
 				<a href="/demo">React Demo</a>
+				<a href="/echart">ECharts</a>
+				<a href="/bug">逆袭之路</a>
 			</div>
 		)
 	}

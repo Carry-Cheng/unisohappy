@@ -29,6 +29,12 @@ export default class Canvas extends Component<CanvasProps, CanvasState> {
 	render() {
 		return (
 			<div className={Style['canvas']}>
+				{/* operating area */}
+				{/* <div className={Style['operating']}>
+					<button onClick={this.canvasToBlob}>toBlob</button>
+					<button onClick={this.canvasDownload}>canvasDownload</button>
+				</div> */}
+				{/* canvas */}
 				<canvas id="canvas" width={this.state.canvasWidth} height={this.state.canvasHeight}></canvas>
 			</div>
 		)
@@ -48,6 +54,7 @@ export default class Canvas extends Component<CanvasProps, CanvasState> {
 	// clear canvas
 	clearCanvas = () => {
 		this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+		this.context.beginPath();
 		this.context.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
 	}
 
@@ -134,5 +141,41 @@ export default class Canvas extends Component<CanvasProps, CanvasState> {
 		}, 200)
 	}
 
+	canvasToBlob = () => {
+		this.canvas.toBlob((result) => {
+			console.info(result);
+			alert('ok toBlob:' + result.size + '-' + result.type);
+		});
+	}
+
+	canvasDownload = () => {
+		this.canvas.toBlob((result) => {
+			this.download(result, 'canvas.png');
+		});
+	}
+
+	// download
+	download = (blob: Blob, fileName: string) => {
+		// only IE10, it's most usage of jquery.
+		if (window.navigator.msSaveBlob != null) {
+			window.navigator.msSaveBlob(blob, fileName);
+		} else {
+			let a = document.createElement('a');
+			let url = window.URL.createObjectURL(blob);
+			if ('download' in a) {
+				a.download = fileName;
+				a.style.display = 'none';
+				a.href = url;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				window.URL.revokeObjectURL(url);
+			} else {
+				// alert('不支持本地下载呀.');
+				window.open(url);
+				window.URL.revokeObjectURL(url);
+			}
+		}
+	} 
 
 }
