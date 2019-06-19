@@ -8,6 +8,7 @@ export default class Index extends Component {
 			<div className={Style['app']}>
 				<img className={Style['logo']} src={Logo} alt="logo"/>
 				<h1>Uni So Happy</h1>
+				<h2>Based on React + TypeScript</h2>
 				<h2>Build with Parcel</h2>
 				<a href="/canvas">Canvas Demo</a>
 				<a href="/demo">React Demo</a>
